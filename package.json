@@ -1,6 +1,6 @@
 {
   "name": "@khanghoang/silhouette",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "silhouette.js",
   "license": "MIT",
   "dependencies": {
