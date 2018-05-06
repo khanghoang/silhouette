@@ -1,0 +1,16 @@
+{
+  "security": {
+    "enabled": true,
+    "priority": 40,
+    "module": {
+        "name": "@khanghoang/silhouette",
+        "arguments": [{
+          "foo": {
+            "module": "./foo",
+            "route": "/foo",
+            "directory": "./node_modules/@khanghoang/silhouette"
+          }
+        }]
+    }
+  }
+}
