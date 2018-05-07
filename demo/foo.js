@@ -1,12 +1,7 @@
-const http = require('http');
-const express = require('express')
+require('babel-register');
 
-const foo = () => {
-  const app = express();
-  app.get('/', (req, res) => {
-    res.json({ hello: 'bar13' })
-  })
-  return app;
-} 
+const foo = require('./fooImpl');
+
+console.log('foo: ', foo);
 
 module.exports = foo;

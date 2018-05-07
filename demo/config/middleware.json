@@ -5,11 +5,11 @@
     "module": {
         "name": "@khanghoang/silhouette",
         "arguments": [{
-          "foo": {
-            "module": "./foo",
+            "name": "./foo",
             "route": "/foo",
-            "directory": "./node_modules/@khanghoang/silhouette"
-          }
+            "method": "bar",
+            "arguments": [],
+            "directory": "./"
         }]
     }
   }
