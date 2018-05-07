@@ -12,15 +12,28 @@ module.exports = (config) => {
     path.join(process.cwd(), module)
     : module;
 
-  const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-  const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-  const app = newAppFactory(newAppArgument);
+  const app = express();
+
+  let settings;
+  let kraken;
+
+  app.on('mount', parent => {
+    // $FlowFixMe
+    app.settings = Object.create(parent.settings);
+    // $FlowFixMe
+    app.kraken = parent.kraken;
+
+    settings = Object.assign({}, parent.settings);
+    kraken = parent.kraken;
+  });
 
   if (route) {
     app.use(route, (req, res, next) => {
       const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
       const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
       const newApp = newAppFactory(newAppArgument);
+      newApp.settings = settings;
+      newApp.kraken = kraken
       newApp(req, res, next);
     });
   } else {
@@ -28,6 +41,8 @@ module.exports = (config) => {
       const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
       const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
       const newApp = newAppFactory(newAppArgument);
+      newApp.settings = settings;
+      newApp.kraken = kraken;
       newApp(req, res, next);
     });
   }
