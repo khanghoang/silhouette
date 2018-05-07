@@ -27,6 +27,7 @@ module.exports = (config) => {
     kraken = parent.kraken;
   });
 
+  // TODO: idk if there is a "route" prop in meddleware config
   if (route) {
     app.use(route, (req, res, next) => {
       const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
