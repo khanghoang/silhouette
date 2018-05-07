@@ -27,26 +27,14 @@ module.exports = (config) => {
     kraken = parent.kraken;
   });
 
-  // TODO: idk if there is a "route" prop in meddleware config
-  if (route) {
-    app.use(route, (req, res, next) => {
-      const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-      const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-      const newApp = newAppFactory(newAppArgument);
-      newApp.settings = settings;
-      newApp.kraken = kraken
-      newApp(req, res, next);
-    });
-  } else {
-    app.use((req, res, next) => {
-      const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-      const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-      const newApp = newAppFactory(newAppArgument);
-      newApp.settings = settings;
-      newApp.kraken = kraken;
-      newApp(req, res, next);
-    });
-  }
+  app.use((req, res, next) => {
+    const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
+    const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
+    const newApp = newAppFactory(newAppArgument);
+    newApp.settings = settings;
+    newApp.kraken = kraken;
+    newApp(req, res, next);
+  });
 
   start(directory, () => {
     const cachedModule = require.cache[require.resolve(finalModulePath)];
