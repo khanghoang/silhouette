@@ -56,6 +56,9 @@ module.exports = (config) => {
       delete require.cache[require.resolve(moduleName)];
     });
     cachedModules = {};
+
+    // reload the module
+    require(finalModulePath);
   }); 
 
   return app;
