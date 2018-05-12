@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "hotware": "file:../",
+    "hotware": "file:../..",
     "babel-register": "^6.26.0",
     "chokidar": "^2.0.3",
     "express": "^4.16.3",
