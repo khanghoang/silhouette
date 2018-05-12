@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 
-const { start } = require('./hot');
-
+const { start } = require('./hot'); 
 let cachedModules = {};
 
 module.exports = (config) => {
@@ -40,7 +39,19 @@ module.exports = (config) => {
     const cachedModule = require.cache[require.resolve(finalModulePath)];
     cachedModules[require.resolve(finalModulePath)] = cachedModule;
     clearCachedChildrenModulesOfModule(cachedModule);
-    Object.keys(cachedModules).map(moduleName => {
+
+    Object.keys(cachedModules).forEach(moduleName => {
+
+      // this will be buggy
+      if (moduleName.indexOf(`/${ module }/`)) {
+        delete require.cache[require.resolve(moduleName)];
+      }
+
+      // don't reload stuff in node_modules folder
+      if (moduleName.indexOf('node_modules') >= 0) {
+        return;
+      }
+
       delete require.cache[require.resolve(moduleName)];
     });
     cachedModules = {};

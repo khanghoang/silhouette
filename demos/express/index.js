@@ -5,5 +5,10 @@ const hotware = require('hotware');
 const foo = require('./fooMiddleware');
 
 const app = express();
-app.use(foo.bar());
+app.use(hotware({
+  name: './fooMiddleware',
+  directory: './',
+  method: 'bar',
+  arguments: []
+}));
 http.createServer(app).listen(8080);

@@ -5,7 +5,10 @@ const foo = {
   bar: () => {
     const app = express();
     app.get('/', (req, res) => {
-      res.json({ hello: '100' })
+      res.json({ hello: '1112123123' })
+    })
+    app.get('/bar', (req, res) => {
+      res.json({ hello: 'bar3' })
     })
     return app;
   } 
