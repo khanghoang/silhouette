@@ -8,7 +8,7 @@ const foo = {
       res.json({ hello: '1112123123' })
     })
     app.get('/bar', (req, res) => {
-      res.json({ hello: 'bar3' })
+      res.json({ hello: 'bar' })
     })
     return app;
   } 

@@ -4,12 +4,16 @@ const path = require('path');
 const { start } = require('./hot'); 
 let cachedModules = {};
 
-module.exports = (config) => {
-  const { name: module, route, directory, method } = config;
+const getFinalPath = (modulePath) => {
+  return modulePath.startsWith('.') ?
+    path.join(process.cwd(), modulePath)
+    : modulePath;
+}
 
-  const finalModulePath = module.startsWith('.') ?
-    path.join(process.cwd(), module)
-    : module;
+module.exports = (config) => {
+  const { name: module, route, directory, method, beforeHotReload, afterHotReload } = config;
+
+  const finalModulePath = getFinalPath(module);
 
   const app = express();
 
@@ -40,6 +44,16 @@ module.exports = (config) => {
     cachedModules[require.resolve(finalModulePath)] = cachedModule;
     clearCachedChildrenModulesOfModule(cachedModule);
 
+    let beforeHotReloadFn, afterHotReloadFn;
+    if (beforeHotReload) {
+      beforeHotReloadFn = require(getFinalPath(beforeHotReload));
+    }
+    if (afterHotReload) {
+      afterHotReloadFn = require(getFinalPath(afterHotReload));
+    }
+
+    beforeHotReloadFn && beforeHotReloadFn();
+
     Object.keys(cachedModules).forEach(moduleName => {
 
       // this will be buggy
@@ -58,6 +72,8 @@ module.exports = (config) => {
 
     // reload the module
     require(finalModulePath);
+
+    afterHotReloadFn && afterHotReloadFn();
   }); 
 
   return app;

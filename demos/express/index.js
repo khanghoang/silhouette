@@ -7,8 +7,10 @@ const foo = require('./fooMiddleware');
 const app = express();
 app.use(hotware({
   name: './fooMiddleware',
-  directory: './',
+  directory: './testFolder',
   method: 'bar',
-  arguments: []
+  arguments: [],
+  beforeHotReload: './log',
+  afterHotReload: './log'
 }));
 http.createServer(app).listen(8080);
