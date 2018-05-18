@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require('path');
+const clearModule = require('./clearModule');
 
 const { start } = require('./hot'); 
-let cachedModules = {};
 
 const getFinalPath = (modulePath) => {
   return modulePath.startsWith('.') ?
@@ -11,14 +11,15 @@ const getFinalPath = (modulePath) => {
 }
 
 module.exports = (config) => {
-  const { name: module, route, directory, method, beforeHotReload, afterHotReload } = config;
+  let cachedModules = {};
+
+  const { name: module, disableAutoHotReload, route, directory, method, beforeHotReload, afterHotReload } = config;
 
   const finalModulePath = getFinalPath(module);
 
   const app = express();
 
-  let settings;
-  let kraken;
+  let settings; let kraken;
 
   app.on('mount', parent => {
     // $FlowFixMe
@@ -40,11 +41,8 @@ module.exports = (config) => {
   });
 
   start(directory, () => {
-    const cachedModule = require.cache[require.resolve(finalModulePath)];
-    cachedModules[require.resolve(finalModulePath)] = cachedModule;
-    clearCachedChildrenModulesOfModule(cachedModule);
 
-    let beforeHotReloadFn, afterHotReloadFn;
+    let beforeHotReloadFn, afterHotReloadFn, onStart;
     if (beforeHotReload) {
       beforeHotReloadFn = require(getFinalPath(beforeHotReload));
     }
@@ -54,37 +52,17 @@ module.exports = (config) => {
 
     beforeHotReloadFn && beforeHotReloadFn();
 
-    Object.keys(cachedModules).forEach(moduleName => {
-
-      // this will be buggy
-      if (moduleName.indexOf(`/${ module }/`)) {
-        delete require.cache[require.resolve(moduleName)];
-      }
-
-      // don't reload stuff in node_modules folder
-      if (moduleName.indexOf('node_modules') >= 0) {
-        return;
-      }
-
-      delete require.cache[require.resolve(moduleName)];
-    });
-    cachedModules = {};
+    if (!disableAutoHotReload) {
+      clearModule(finalModulePath, cachedModules);
+    }
 
     // reload the module
-    require(finalModulePath);
+    if (!disableAutoHotReload) {
+      require(finalModulePath);
+    }
 
     afterHotReloadFn && afterHotReloadFn();
   }); 
 
   return app;
-};
-
-const clearCachedChildrenModulesOfModule = (module) => {
-  if (module && module.children) {
-    module.children.forEach((mol) => {
-      if (cachedModules[mol.id]) return;
-      cachedModules[require.resolve(mol.id)] = mol;
-      clearCachedChildrenModulesOfModule(mol);
-    });
-  }
 };
