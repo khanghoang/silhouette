@@ -10,6 +10,14 @@ const getFinalPath = (modulePath) => {
     : modulePath;
 }
 
+const copySettingFromParent = (app, parentApp) => {
+  Object.keys(parentApp).forEach(k => {
+    if (parentApp[k] && !app[k]) {
+      app[k] = parentApp[k];
+    }
+  });
+}
+
 module.exports = (config) => {
   let cachedModules = {};
 
@@ -22,27 +30,20 @@ module.exports = (config) => {
   let settings; let kraken;
 
   app.on('mount', parent => {
-    // $FlowFixMe
-    app.settings = Object.create(parent.settings);
-    // $FlowFixMe
-    app.kraken = parent.kraken;
-
-    settings = Object.assign({}, parent.settings);
-    kraken = parent.kraken;
+    copySettingFromParent(app, parent);
   });
 
   app.use((req, res, next) => {
     const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
     const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
     const newApp = newAppFactory(newAppArgument);
-    newApp.settings = settings;
-    newApp.kraken = kraken;
+    copySettingFromParent(newApp, app);
     newApp(req, res, next);
   });
 
   start(directory, () => {
 
-    let beforeHotReloadFn, afterHotReloadFn, onStart;
+    let beforeHotReloadFn, afterHotReloadFn;
     if (beforeHotReload) {
       beforeHotReloadFn = require(getFinalPath(beforeHotReload));
     }
@@ -56,8 +57,8 @@ module.exports = (config) => {
       clearModule(finalModulePath, cachedModules);
     }
 
-    // reload the module
     if (!disableAutoHotReload) {
+      // reload the module
       require(finalModulePath);
     }
 
