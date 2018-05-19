@@ -14,6 +14,12 @@ const clear = (module, cachedModules) => {
 };      
 
 const clearCachedChildrenModulesOfModule = (module, cachedModules = {}) => {
+  try {
+    require.resolve(module);
+  } catch (error) {
+    /* handle error */
+    return;
+  }
   const cachedModule = require.cache[require.resolve(module)];
   if (!cachedModule) {
     return;
