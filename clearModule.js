@@ -18,6 +18,7 @@ const clearCachedChildrenModulesOfModule = (module, cachedModules = {}) => {
     require.resolve(module);
   } catch (error) {
     /* handle error */
+    console.log(`Cannot clear cache of module ${ module } because of ${ error }`);
     return;
   }
   const cachedModule = require.cache[require.resolve(module)];
