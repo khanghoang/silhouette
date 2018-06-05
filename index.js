@@ -11,11 +11,11 @@ const getFinalPath = (modulePath) => {
 }
 
 const copySettingFromParent = (app, parentApp) => {
-  Object.keys(parentApp).forEach(k => {
-    if (parentApp[k] && !app[k]) {
-      app[k] = parentApp[k];
-    }
-  });
+  app.set('view', parentApp.get('view'));
+  app.set('view engine', parentApp.get('view engine'));
+  app.set('views', parentApp.get('views'));
+  app.set('kraken', parentApp.get('kraken'));
+  app.engines = parentApp.engines;
 }
 
 module.exports = (config) => {
