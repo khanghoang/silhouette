@@ -33,13 +33,11 @@ module.exports = (config) => {
     copySettingFromParent(app, parent);
   });
 
-  app.use((req, res, next) => {
-    const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-    const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-    const newApp = newAppFactory(newAppArgument);
-    copySettingFromParent(newApp, app);
-    newApp(req, res, next);
-  });
+  const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
+  const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
+  const newApp = newAppFactory(newAppArgument);
+
+  app.use(newApp);
 
   start(directory, () => {
 
@@ -52,6 +50,9 @@ module.exports = (config) => {
     }
 
     beforeHotReloadFn && beforeHotReloadFn();
+
+    app._router.stack.pop();
+    app.use(newApp);
 
     if (!disableAutoHotReload) {
       clearModule(finalModulePath, cachedModules);
