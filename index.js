@@ -18,6 +18,13 @@ const copySettingFromParent = (app, parentApp) => {
   app.engines = parentApp.engines;
 }
 
+const fetchNewAppFactory = (modulePath, method, config) => {
+  const newAppFactory = method ? require(modulePath)[method] : require(modulePath);
+  const newAppArguments = config.arguments.length > 0 ? config.arguments[0] : {}
+
+  return newAppFactory(newAppArguments);
+}
+
 module.exports = (config) => {
   let cachedModules = {};
 
@@ -33,11 +40,7 @@ module.exports = (config) => {
     copySettingFromParent(app, parent);
   });
 
-  const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-  const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-  const newApp = newAppFactory(newAppArgument);
-
-  app.use(newApp);
+  app.use(fetchNewAppFactory(finalModulePath, method, config));
 
   start(directory, () => {
 
@@ -51,8 +54,6 @@ module.exports = (config) => {
 
     beforeHotReloadFn && beforeHotReloadFn();
 
-    app._router.stack.pop();
-    app.use(newApp);
 
     if (!disableAutoHotReload) {
       clearModule(finalModulePath, cachedModules);
@@ -60,7 +61,8 @@ module.exports = (config) => {
 
     if (!disableAutoHotReload) {
       // reload the module
-      require(finalModulePath);
+      app._router.stack.pop();
+      app.use(fetchNewAppFactory(finalModulePath, method, config));
     }
 
     afterHotReloadFn && afterHotReloadFn();
