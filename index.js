@@ -15,7 +15,10 @@ const copySettingFromParent = (app, parentApp) => {
   app.set('view engine', parentApp.get('view engine'));
   app.set('views', parentApp.get('views'));
   app.set('kraken', parentApp.get('kraken'));
-  app.engines = parentApp.engines;
+
+  if(Object.keys(parentApp.engines).length) {
+    app.engines = parentApp.engines;
+  }
 }
 
 const fetchNewAppFactory = (parent, modulePath, method, config) => {
