@@ -15,7 +15,20 @@ const copySettingFromParent = (app, parentApp) => {
   app.set('view engine', parentApp.get('view engine'));
   app.set('views', parentApp.get('views'));
   app.set('kraken', parentApp.get('kraken'));
-  app.engines = parentApp.engines;
+
+  if(Object.keys(parentApp.engines).length) {
+    app.engines = parentApp.engines;
+  }
+}
+
+const fetchNewAppFactory = (parent, modulePath, method, config) => {
+  const newAppFactory = method ? require(modulePath)[method] : require(modulePath);
+  const newAppArguments = config.arguments.length > 0 ? config.arguments[0] : {}
+  const newApp = newAppFactory(newAppArguments);
+
+  copySettingFromParent(newApp, parent);
+
+  return newApp;
 }
 
 module.exports = (config) => {
@@ -33,13 +46,7 @@ module.exports = (config) => {
     copySettingFromParent(app, parent);
   });
 
-  app.use((req, res, next) => {
-    const newAppFactory = method ? require(finalModulePath)[method] : require(finalModulePath);
-    const newAppArgument = config.arguments.length > 0 ? config.arguments[0] : {}
-    const newApp = newAppFactory(newAppArgument);
-    copySettingFromParent(newApp, app);
-    newApp(req, res, next);
-  });
+  app.use(fetchNewAppFactory(app, finalModulePath, method, config));
 
   start(directory, () => {
 
@@ -59,7 +66,8 @@ module.exports = (config) => {
 
     if (!disableAutoHotReload) {
       // reload the module
-      require(finalModulePath);
+      app._router.stack.pop();
+      app.use(fetchNewAppFactory(app, finalModulePath, method, config));
     }
 
     afterHotReloadFn && afterHotReloadFn();
