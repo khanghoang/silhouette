@@ -48,9 +48,8 @@ module.exports = (config) => {
 
   app.on('mount', parent => {
     copySettingFromParent(app, parent);
+    app.use(fetchNewAppFactory(app, finalModulePath, method, config));
   });
-
-  app.use(fetchNewAppFactory(app, finalModulePath, method, config));
 
   start(directory, () => {
 
