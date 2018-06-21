@@ -12,5 +12,5 @@ const start = (dir, fn) => {
 }
 
 module.exports = {
-  start,
+  start
 };
