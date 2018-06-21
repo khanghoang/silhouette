@@ -14,7 +14,11 @@ const copySettingFromParent = (app, parentApp) => {
   app.set('view', parentApp.get('view'));
   app.set('view engine', parentApp.get('view engine'));
   app.set('views', parentApp.get('views'));
-  app.set('kraken', parentApp.get('kraken'));
+
+  // If parent is kraken, then use it.
+  if (parentApp.kraken) {
+    app.kraken = parentApp.kraken;
+  }
 
   if(Object.keys(parentApp.engines).length) {
     app.engines = parentApp.engines;
