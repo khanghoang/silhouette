@@ -1,8 +1,9 @@
 {
   "name": "hotware",
+  "description": "A higher-order middleware (HOM) to make meddleware hot reload",
   "version": "0.0.10",
   "main": "index.js",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "chokidar": "^2.0.3",
     "express": "^4.16.3"
